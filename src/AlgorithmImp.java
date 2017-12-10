@@ -7,17 +7,15 @@
 import java.util.*;
 
 import Bean.Enity;
-import Rule.Check;
 import Transfer.Algorithm;
 
 import static Utile.Utile.copyEnity;
 import static java.lang.Math.abs;
-import static sun.swing.MenuItemLayoutHelper.max;
 
 public class AlgorithmImp implements Algorithm {
     //供你们参考的党徽里每个点具体的位置
-    List<Enity> aim = new ArrayList<>();
-    boolean first = true;//第一次加载时创建目标列表
+    private List<Enity> aim = new ArrayList<>();
+    private boolean first = true;//第一次加载时创建目标列表
     // 算法规则
     /*
      * 功能：计算每一个人物到达的下一个的位置，建议玩家使用更优算法修改，特别是带碰撞检测
@@ -29,124 +27,98 @@ public class AlgorithmImp implements Algorithm {
 	 *                    每个点每次只能移动一次，步长可以通过getStep()来查看。如果多次移动，我们会检查并给你报错的
 	 *                    
 	 */
-
-//	public List<Enity> rule(List<Enity> init)
-//	{
-//		//为了便于大家遍历我们的目标结果序列。我们这里创建了一份目标序列
-//		if(first)
-//		{
-//			AimPoint();
-//			first=false;
-//            for (Enity anInit : init) {
-//                System.out.println(anInit.getX() + "," + anInit.getY());
-//            }
-//		}
-//		Iterator<Enity> it1, it2;
-//		it1 = init.iterator();
-//		it2 = aim.iterator();
-//		List<Enity> ans = new ArrayList<>();
-//		while (it1.hasNext())
-//		{
-//			Enity e1 = it1.next();
-//			Enity e2 = it2.next();
-//            System.out.println("起始点："+e1.getX()+","+e1.getY()+" 目标点："+e2.getX()+","+e2.getY());
-//            if (e1.getX() != e2.getX())
-//			{
-//				if (e1.getX() < e2.getX())
-//					e1.movingRight();
-//				else
-//					e1.movingLeft();
-//			} else if (e1.getY() != e2.getY())
-//			{
-//				if (e1.getY() < e2.getY())
-//					e1.movingDown();
-//				else
-//					e1.movingUp();
-//			}
-//			ans.add(e1);
-//		}
-//		return ans;
-//	}
-
-
-    int time = 0;
+    private int time = 0;
+    private static int waitTime = 0;
 
     public List<Enity> rule(List<Enity> init) {
         List<Enity> ans = new ArrayList<>();
         //为了便于大家遍历我们的目标结果序列。我们这里创建了一份目标序列
         if (first) {
-            AimPoint();
+            initAim();
             first = false;
         }
         findRightAim(init);
-        List<MyEnity> myinit = new ArrayList<>();
+        List<MyEnity> myInit = new ArrayList<>();
         for (int i = 0; i < init.size(); i++) {//初始化myinit并计算路径长度
-            myinit.add(new MyEnity(init.get(i), i));
-            myinit.get(i).culLength(aim.get(i));
+            myInit.add(new MyEnity(init.get(i), i));
+            myInit.get(i).calLength(aim.get(i));
         }
-        Collections.sort(myinit);//按照路径长度排序
-        setMyEnityInfo(myinit);//设置每个点的可移动信息
+        Collections.sort(myInit);//按照路径长度排序
+        setMyEnityInfo(myInit);//设置每个点的可移动信息
         boolean canMove = true;
-        while (canMove && (!isAllMoved(myinit))) {
+        while (canMove) {
             canMove = false;
-            for (int i = 0; i < myinit.size(); i++) {
-                MyEnity e1 = myinit.get(i);
+            for (int i = 0; i < myInit.size(); i++) {
+                MyEnity e1 = myInit.get(i);
                 if (!e1.isMoved() && e1.getLength() != 0) {
                     Enity e2 = aim.get(e1.getAim());//找到与e1对应的目标点
-                    boolean isMoved = false;
-                    if (e1.getX() < e2.getX()) {
-                        if (e1.isCanRight()) {
-                            e1.movingRight();
-                            isMoved = true;
-                        }
-                    } else if (e1.getX() > e2.getX()) {
-                        if (e1.isCanLeft()) {
-                            e1.movingLeft();
-                            isMoved = true;
-                        }
-                    } else if (e1.getY() < e2.getY()) {
-                        if (e1.isCanDown()) {
-                            e1.movingDown();
-                            isMoved = true;
-                        }
-                    } else if (e1.getY() > e2.getY()) {
-                        if (e1.isCanUp()) {
-                            e1.movingUp();
-                            isMoved = true;
-                        }
-                    }
-                    if (isMoved) {
+                    canMove = tryMove(e1, e2);
+                    if (canMove) {
                         e1.setMoved(true);
-                        setMyEnityInfo(myinit);
-                        canMove = true;
+                        setMyEnityInfo(myInit);
                     }
                 }
             }
         }
-        time++;
-        boolean is = true;
-        for (MyEnity aMyinit1 : myinit) {
-            if (aMyinit1.getLength() != 0) {
-                is = false;
-                break;
-            }
-        }
-        if (is) {
-            System.out.println(time);
-            time = 0;
-        }
-        for (int i = 0; i < myinit.size(); i++) {
-            for (MyEnity aMyinit : myinit) {
-                if (aMyinit.getNum() == i) {
-                    ans.add(aMyinit);
-                }
+
+        test(myInit);
+
+        for (int i = 0; i < myInit.size(); i++) {
+            for (MyEnity enity : myInit) {
+                if (enity.getNum() == i) ans.add(enity);
             }
         }
         return ans;
     }
 
+    private void test(List<MyEnity> myInit) {
+        time++;
+        boolean is = true;
+        for (MyEnity aMyinit1 : myInit) {
+            if (aMyinit1.getLength() != 0) {
+                is = false;
+                break;
+            }
+            if (!aMyinit1.isMoved()) {
+                waitTime++;
+            }
+        }
+        if (is) {
+            System.out.println(time);
+            System.out.println(waitTime);
+            waitTime = 0;
+            time = 0;
+        }
+    }
+
+    private boolean tryMove(MyEnity e1, Enity e2) {
+        if (e1.getX() < e2.getX()) {
+            if (e1.isCanRight()) {
+                e1.movingRight();
+                return true;
+            }
+        } else if (e1.getX() > e2.getX()) {
+            if (e1.isCanLeft()) {
+                e1.movingLeft();
+                return true;
+            }
+        }
+        if (e1.getY() < e2.getY()) {
+            if (e1.isCanDown()) {
+                e1.movingDown();
+                return true;
+            }
+        } else if (e1.getY() > e2.getY()) {
+            if (e1.isCanUp()) {
+                e1.movingUp();
+                return true;
+            }
+        }
+        return false;
+    }
+
     //友情提供，各个点的位置
-    public List<Enity> AimPoint() {
+    private void initAim() {
         aim.add(new Enity(14, 4));
         aim.add(new Enity(15, 4));
         aim.add(new Enity(16, 4));
@@ -274,47 +246,23 @@ public class AlgorithmImp implements Algorithm {
         aim.add(new Enity(13, 26));
         aim.add(new Enity(14, 26));
         aim.add(new Enity(22, 26));
-        return aim;
-    }
-
-
-    private boolean isAllMoved(List<MyEnity> myEnityList) {
-        for (MyEnity aMyEnityList : myEnityList) {
-            if (!aMyEnityList.isMoved()) {
-                return false;
-            }
-        }
-        return true;
     }
 
     private void setMyEnityInfo(List<MyEnity> myEnityList) {
         for (MyEnity aMyEnityList : myEnityList) {
-            aMyEnityList.culLength(aim.get(aMyEnityList.getAim()));
+            aMyEnityList.calLength(aim.get(aMyEnityList.getAim()));
         }
-
         for (int i = 0; i < myEnityList.size(); i++) {
             MyEnity myEnity = myEnityList.get(i);
-            int leftX, rightX, upX, downX, leftY, rightY, upY, downY;
-            leftX = myEnity.getX() - myEnity.getStep();
-            leftY = myEnity.getY();
-            rightX = myEnity.getX() + myEnity.getStep();
-            rightY = myEnity.getY();
-            upX = myEnity.getX();
-            upY = myEnity.getY() - myEnity.getStep();
-            downX = myEnity.getX();
-            downY = myEnity.getY() + myEnity.getStep();
+            myEnity.resetCanMove();
+            int[] dx = {1, -1, 0, 0};
+            int[] dy = {0, 0, 1, -1};
             for (MyEnity myEnity1 : myEnityList) {
-                if (myEnity1.getX() == leftX && myEnity1.getY() == leftY) {
-                    myEnity.setCanLeft();
-                }
-                if (myEnity1.getX() == rightX && myEnity1.getY() == rightY) {
-                    myEnity.setCanRight();
-                }
-                if (myEnity1.getX() == upX && myEnity1.getY() == upY) {
-                    myEnity.setCanUp();
-                }
-                if (myEnity1.getX() == downX && myEnity1.getY() == downY) {
-                    myEnity.setCanDown();
+                for (int j = 0; j < 4; ++j) {
+                    if (myEnity1.getX() == myEnity.getX() + dx[j]
+                            && myEnity1.getY() == myEnity.getY() + dy[j]) {
+                        myEnity.setCanMove(dx[j], dy[j]);
+                    }
                 }
             }
         }
@@ -323,33 +271,33 @@ public class AlgorithmImp implements Algorithm {
     private void findRightAim(List<Enity> enityList) {
         int[] length = new int[enityList.size()];
         for (int i = 0; i < enityList.size(); i++) {
-            length[i] = culLength(enityList.get(i), aim.get(i));
+            length[i] = calLength(enityList.get(i), aim.get(i));
         }
+        Enity ie, je, ia, ja;
         for (int i = 0; i < enityList.size(); i++) {
             for (int j = 0; j < enityList.size(); j++) {
-                Enity ie = enityList.get(i);
-                Enity je = enityList.get(j);
-                Enity ia = aim.get(i);
-                Enity ja = aim.get(j);
-                if (Math.max(culLength(ie, ja), culLength(je, ia)) < Math.max(length[i], length[j])) {
-                    Enity temp = copyEnity(ia);
-                    aim.set(i, ja);
-                    aim.set(j, temp);
-                    swapInt(length[i], length[j]);
+                ie = enityList.get(i);
+                je = enityList.get(j);
+                ia = aim.get(i);
+                ja = aim.get(j);
+                if (Math.max(calLength(ie, ja), calLength(je, ia)) < Math.max(length[i], length[j])) {
+                    swapAim(length, ia, ja, i, j);
                 }
             }
         }
     }
 
-    private int culLength(Enity e1, Enity e2) {
-        int length = abs(e1.getX() - e2.getX()) + abs(e1.getY() - e2.getY());
-        return length;
+    private void swapAim(int[] length, Enity ia, Enity ja, int i, int j) {
+        Enity temp = copyEnity(ia);
+        aim.set(i, ja);
+        aim.set(j, temp);
+        int tempInt = length[i];
+        length[i] = length[j];
+        length[j] = tempInt;
     }
 
-    private void swapInt(int a, int b) {
-        int temp = a;
-        a = b;
-        b = temp;
+    private int calLength(Enity e1, Enity e2) {
+        return abs(e1.getX() - e2.getX()) + abs(e1.getY() - e2.getY());
     }
 
 }

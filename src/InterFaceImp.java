@@ -8,9 +8,7 @@
 import java.awt.Color;
 import java.util.List;
 
-import javax.swing.BorderFactory;
-import javax.swing.JLabel;
-import javax.swing.JProgressBar;
+import javax.swing.*;
 import javax.swing.border.Border;
 
 import Bean.Enity;
@@ -55,12 +53,22 @@ public class InterFaceImp implements InterFace {
 	// 我直接把框架类扔给你美化吧
 	public Face setFaceUI(Face face) {
 		//这里能对整个游戏的外部框架，菜单栏进行美化，还能添加你觉得需要的其他容器
+		JMenu menu=new JMenu("编辑(E)");
+		JMenuItem item=new JMenuItem("撤销");
+		JMenuBar menuBar=new JMenuBar();
+		menu.add(item);
+		menuBar.add(menu);
+
+		face.getContentPane().add(menuBar);
+
+
 		return face;
 	}
 
 	// 我直接把棋盘类扔给你。让你美化算了
 	public MyPanel setJPanelUI(MyPanel myPanel) {
 		//这里能对棋盘jpanel进行美化
+
 		return myPanel;
 	}
 

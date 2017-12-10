@@ -32,40 +32,39 @@ public class MyEnity extends Enity implements Comparable<MyEnity> {
         return isCanLeft;
     }
 
-    void setCanLeft() {
-        isCanLeft = false;
-    }
+
 
     boolean isCanRight() {
         return isCanRight;
     }
 
-    void setCanRight() {
-        isCanRight = false;
-    }
+
 
     boolean isCanUp() {
         return isCanUp;
     }
 
-    void setCanUp() {
-        isCanUp = false;
-    }
 
     boolean isCanDown() {
         return isCanDown;
     }
 
-    void setCanDown() {
-        isCanDown = false;
+    void resetCanMove() {
+        isCanUp = true;
+        isCanRight = true;
+        isCanLeft = true;
+        isCanDown = true;
     }
 
-    public int getAim() {
+    void setCanMove(int dx, int dy) {
+        if (dx < 0) isCanLeft = false;
+        else if (dx > 0) isCanRight = false;
+        else if (dy < 0) isCanUp = false;
+        else if (dy > 0) isCanDown = false;
+    }
+
+    int getAim() {
         return aim;
-    }
-
-    public void setAim(int aim) {
-        this.aim = aim;
     }
 
     MyEnity(Enity enity, int n) {
@@ -86,15 +85,10 @@ public class MyEnity extends Enity implements Comparable<MyEnity> {
         return length;
     }
 
-    void culLength(Enity enity) {
+    void calLength(Enity enity) {
         this.length = abs(this.getX() - enity.getX()) + abs(this.getY() - enity.getY());
     }
 
-
-    int findLength(Enity enity) {
-        int length1 = abs(this.getX() - enity.getX()) + abs(this.getY() - enity.getY());
-        return length1;
-    }
 
     @Override
     public int compareTo(MyEnity o) {
