@@ -19,7 +19,7 @@ public class Main {
 		Common.getHEIGHT();//获取棋盘宽度
 		Common.getSTEP();//获取步长
 		Common.getSpeed();//获得游戏刷新速度
-		Common.setSpeed(1);//设置游戏刷新速度一秒，为了便于调速，但是比赛官方实数是1秒
+		Common.setSpeed(1000);//设置游戏刷新速度一秒，为了便于调速，但是比赛官方实数是1秒
 		Common.getAlltime();// 游戏的总时间
 		Common.getCount();// 游戏当前碰撞次数
 		Common.getUseTime();// 游戏已用时间

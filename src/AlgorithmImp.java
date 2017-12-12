@@ -29,6 +29,9 @@ public class AlgorithmImp implements Algorithm {
 	 */
     private int time = 0;
     private static int waitTime = 0;
+    private static int allTime = 0;
+    private static int playTime = 0;
+
 
     public List<Enity> rule(List<Enity> init) {
         List<Enity> ans = new ArrayList<>();
@@ -37,12 +40,13 @@ public class AlgorithmImp implements Algorithm {
             initAim();
             first = false;
         }
-        findRightAim(init);
+
         List<MyEnity> myInit = new ArrayList<>();
         for (int i = 0; i < init.size(); i++) {//初始化myinit并计算路径长度
             myInit.add(new MyEnity(init.get(i), i));
             myInit.get(i).calLength(aim.get(i));
         }
+        findRightAim(myInit);
         Collections.sort(myInit);//按照路径长度排序
         setMyEnityInfo(myInit);//设置每个点的可移动信息
         boolean canMove = true;
@@ -55,7 +59,7 @@ public class AlgorithmImp implements Algorithm {
                     canMove = tryMove(e1, e2);
                     if (canMove) {
                         e1.setMoved(true);
-                        setMyEnityInfo(myInit);
+                        setMyEnityInfo(myInit);//设置每个点的可移动信息
                     }
                 }
             }
@@ -84,10 +88,15 @@ public class AlgorithmImp implements Algorithm {
             }
         }
         if (is) {
-            System.out.println(time);
-            System.out.println(waitTime);
+            System.out.println("本次移动次数：" + time);
+            System.out.println("本次等待次数：" + waitTime);
+            allTime += time;
+            playTime++;
+            System.out.println("平均移动次数：" + allTime / (double) playTime);
+            System.out.println("总测试次数：" + playTime);
             waitTime = 0;
             time = 0;
+            first = true;
         }
     }
 
@@ -268,20 +277,55 @@ public class AlgorithmImp implements Algorithm {
         }
     }
 
-    private void findRightAim(List<Enity> enityList) {
+    private MyEnity getXWant(MyEnity myEnity) {
+        MyEnity wantEnity = new MyEnity(myEnity);
+        if (myEnity.getX() < aim.get(myEnity.getAim()).getX())
+            wantEnity.movingRight();
+        else if (myEnity.getX() > aim.get(myEnity.getAim()).getX())
+            wantEnity.movingLeft();
+        else if (myEnity.getY() < aim.get(myEnity.getAim()).getY())
+            wantEnity.movingDown();
+        else if (myEnity.getY() > aim.get(myEnity.getAim()).getY())
+            wantEnity.movingUp();
+        return wantEnity;
+    }
+
+    private MyEnity getYWant(MyEnity myEnity) {
+        MyEnity wantEnity = new MyEnity(myEnity);
+        if (myEnity.getY() < aim.get(myEnity.getAim()).getY())
+            wantEnity.movingDown();
+        else if (myEnity.getY() > aim.get(myEnity.getAim()).getY())
+            wantEnity.movingUp();
+        else if (myEnity.getX() < aim.get(myEnity.getAim()).getX())
+            wantEnity.movingRight();
+        else if (myEnity.getX() > aim.get(myEnity.getAim()).getX())
+            wantEnity.movingLeft();
+        return wantEnity;
+    }
+
+    private void findRightAim(List<MyEnity> enityList) {
         int[] length = new int[enityList.size()];
         for (int i = 0; i < enityList.size(); i++) {
             length[i] = calLength(enityList.get(i), aim.get(i));
         }
-        Enity ie, je, ia, ja;
+        MyEnity enityi, enityj;
+        Enity aimi, aimj;
         for (int i = 0; i < enityList.size(); i++) {
             for (int j = 0; j < enityList.size(); j++) {
-                ie = enityList.get(i);
-                je = enityList.get(j);
-                ia = aim.get(i);
-                ja = aim.get(j);
-                if (Math.max(calLength(ie, ja), calLength(je, ia)) < Math.max(length[i], length[j])) {
-                    swapAim(length, ia, ja, i, j);
+                enityi = enityList.get(i);
+                enityj = enityList.get(j);
+                aimi = aim.get(enityi.getAim());
+                aimj = aim.get(enityj.getAim());
+                int pong = 0;
+                if (pong(getXWant(enityi), getXWant(enityj))) {
+                    pong = 1;
+                } else if (pong(getYWant(enityi), getYWant(enityj))) {
+                    pong = 1;
+                }
+                if (Math.max(calLength(enityi, aimj), calLength(enityj, aimi)) < Math.max(length[i], length[j])+ pong) {
+                    swapAim(length, aimi, aimj, i, j);
+                    length[i] = calLength(enityi, aimj);
+                    length[j] = calLength(enityj, aimi);
                 }
             }
         }
@@ -291,13 +335,15 @@ public class AlgorithmImp implements Algorithm {
         Enity temp = copyEnity(ia);
         aim.set(i, ja);
         aim.set(j, temp);
-        int tempInt = length[i];
-        length[i] = length[j];
-        length[j] = tempInt;
     }
 
     private int calLength(Enity e1, Enity e2) {
         return abs(e1.getX() - e2.getX()) + abs(e1.getY() - e2.getY());
     }
+
+    private boolean pong(Enity e1, Enity e2) {
+        return e1.getX() == e2.getX() && e1.getY() == e2.getY();
+    }
+
 
 }

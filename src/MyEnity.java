@@ -49,11 +49,24 @@ public class MyEnity extends Enity implements Comparable<MyEnity> {
         return isCanDown;
     }
 
+    public void setAim(int aim) {
+        this.aim = aim;
+    }
+
     void resetCanMove() {
         isCanUp = true;
         isCanRight = true;
         isCanLeft = true;
         isCanDown = true;
+
+    }
+
+    MyEnity(MyEnity enity) {
+        super(enity.getX(), enity.getY(), enity.getId(), enity.getStep(), 32, 30);
+        length = enity.length;
+        num = enity.num;
+        aim = enity.aim;
+        isMoved = enity.isMoved;
     }
 
     void setCanMove(int dx, int dy) {
