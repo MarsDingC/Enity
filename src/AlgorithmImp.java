@@ -75,6 +75,11 @@ public class AlgorithmImp implements Algorithm {
         return ans;
     }
 
+    /**
+     * 测试移动次数和等待次数
+     *
+     * @param myInit
+     */
     private void test(List<MyEnity> myInit) {
         time++;
         boolean is = true;
@@ -100,6 +105,13 @@ public class AlgorithmImp implements Algorithm {
         }
     }
 
+    /**
+     * 对每个点尝试移动
+     *
+     * @param e1 将要移动的点
+     * @param e2 目标点
+     * @return
+     */
     private boolean tryMove(MyEnity e1, Enity e2) {
         if (e1.getX() < e2.getX()) {
             if (e1.isCanRight()) {
@@ -257,6 +269,11 @@ public class AlgorithmImp implements Algorithm {
         aim.add(new Enity(22, 26));
     }
 
+    /**
+     * 设置每个点的可移动信息
+     *
+     * @param myEnityList
+     */
     private void setMyEnityInfo(List<MyEnity> myEnityList) {
         for (MyEnity aMyEnityList : myEnityList) {
             aMyEnityList.setLength(aim.get(aMyEnityList.getAim()));
@@ -303,6 +320,12 @@ public class AlgorithmImp implements Algorithm {
         return wantEnity;
     }
 
+
+    /**
+     * 进行路径规划，使局部每两点的路径长度中的最大值最小，达成全局最大路径最小
+     *
+     * @param enityList
+     */
     private void findRightAim(List<MyEnity> enityList) {
         int[] length = new int[enityList.size()];
         for (int i = 0; i < enityList.size(); i++) {
