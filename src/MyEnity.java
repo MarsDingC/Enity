@@ -98,8 +98,8 @@ public class MyEnity extends Enity implements Comparable<MyEnity> {
         return length;
     }
 
-    void calLength(Enity enity) {
-        this.length = abs(this.getX() - enity.getX()) + abs(this.getY() - enity.getY());
+    void setLength(Enity enity) {
+        this.length=MyFunction.calLength(this,enity);
     }
 
 

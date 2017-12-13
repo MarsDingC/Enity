@@ -44,7 +44,7 @@ public class AlgorithmImp implements Algorithm {
         List<MyEnity> myInit = new ArrayList<>();
         for (int i = 0; i < init.size(); i++) {//初始化myinit并计算路径长度
             myInit.add(new MyEnity(init.get(i), i));
-            myInit.get(i).calLength(aim.get(i));
+            myInit.get(i).setLength(aim.get(i));
         }
         findRightAim(myInit);
         Collections.sort(myInit);//按照路径长度排序
@@ -259,7 +259,7 @@ public class AlgorithmImp implements Algorithm {
 
     private void setMyEnityInfo(List<MyEnity> myEnityList) {
         for (MyEnity aMyEnityList : myEnityList) {
-            aMyEnityList.calLength(aim.get(aMyEnityList.getAim()));
+            aMyEnityList.setLength(aim.get(aMyEnityList.getAim()));
         }
         for (int i = 0; i < myEnityList.size(); i++) {
             MyEnity myEnity = myEnityList.get(i);
@@ -306,7 +306,7 @@ public class AlgorithmImp implements Algorithm {
     private void findRightAim(List<MyEnity> enityList) {
         int[] length = new int[enityList.size()];
         for (int i = 0; i < enityList.size(); i++) {
-            length[i] = calLength(enityList.get(i), aim.get(i));
+            length[i] = MyFunction.calLength(enityList.get(i), aim.get(i));
         }
         MyEnity enityi, enityj;
         Enity aimi, aimj;
@@ -317,15 +317,15 @@ public class AlgorithmImp implements Algorithm {
                 aimi = aim.get(enityi.getAim());
                 aimj = aim.get(enityj.getAim());
                 int pong = 0;
-                if (pong(getXWant(enityi), getXWant(enityj))) {
+                if (MyFunction.pong(getXWant(enityi), getXWant(enityj))) {
                     pong = 1;
-                } else if (pong(getYWant(enityi), getYWant(enityj))) {
+                } else if (MyFunction.pong(getYWant(enityi), getYWant(enityj))) {
                     pong = 1;
                 }
-                if (Math.max(calLength(enityi, aimj), calLength(enityj, aimi)) < Math.max(length[i], length[j])+ pong) {
+                if (Math.max(MyFunction.calLength(enityi, aimj), MyFunction.calLength(enityj, aimi)) < Math.max(length[i], length[j]) + pong) {
                     swapAim(length, aimi, aimj, i, j);
-                    length[i] = calLength(enityi, aimj);
-                    length[j] = calLength(enityj, aimi);
+                    length[i] = MyFunction.calLength(enityi, aimj);
+                    length[j] = MyFunction.calLength(enityj, aimi);
                 }
             }
         }
@@ -335,14 +335,6 @@ public class AlgorithmImp implements Algorithm {
         Enity temp = copyEnity(ia);
         aim.set(i, ja);
         aim.set(j, temp);
-    }
-
-    private int calLength(Enity e1, Enity e2) {
-        return abs(e1.getX() - e2.getX()) + abs(e1.getY() - e2.getY());
-    }
-
-    private boolean pong(Enity e1, Enity e2) {
-        return e1.getX() == e2.getX() && e1.getY() == e2.getY();
     }
 
 

@@ -58,9 +58,9 @@ public class InterFaceImp implements InterFace {
             for (int i = 0; i < now.size(); i++) {
                 int nx = now.get(i).getX();
                 int ny = now.get(i).getY();
-                if (nx == aim.get(i).getX() && ny == aim.get(i).getY()) {
-                    System.out.println("nx=" + nx + " ny=" + ny
-                            + " ax=" + aim.get(i).getX() + " ay=" + aim.get(i).getY());
+                if (MyFunction.pong(now.get(i),aim.get(i))) {
+                    MyFunction.printEnityXY(now.get(i));
+                    MyFunction.printEnityXY(aim.get(i));
                     jlabel[nx][ny].setIcon(stand);
                 } else
                     jlabel[nx][ny].setIcon(icon);
