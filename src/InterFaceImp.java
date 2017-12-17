@@ -117,18 +117,18 @@ public class InterFaceImp implements InterFace {
             for (int i = 0; i < now.size(); i++) {
                 int nx = now.get(i).getX();
                 int ny = now.get(i).getY();
-//                if (nx == aim.get(i).getX() && ny == aim.get(i).getY()) {
-//                    System.out.println("nx=" + nx + " ny=" + ny
-//                            + " ax=" + aim.get(i).getX() + " ay=" + aim.get(i).getY());
-//                    jlabel[nx][ny].setIcon(stand);
-//                } else
+
                 if (aim.get(i).getY() > ny)
                     jlabel[nx][ny].setIcon(right_walks[step]);
                 else
                     jlabel[nx][ny].setIcon(left_walks[step]);
+                if (MyFunction.pong(now.get(i),aim.get(i))) {
+                    MyFunction.printEnityXY(now.get(i));
+                    MyFunction.printEnityXY(aim.get(i));
+                    jlabel[nx][ny].setIcon(stand);
+                } else
+                    jlabel[nx][ny].setIcon(icon);
 
-//                jlabel[nx][ny].setText(
-//                        jlabel[nx][ny].getText() + " " + now.get(i).getId() + "");
                 if (first) jlabel[nx][ny].setBackground(Color.RED);
             }
             step = (step + 1) % walks.length;
