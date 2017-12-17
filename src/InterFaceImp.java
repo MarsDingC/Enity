@@ -7,6 +7,7 @@
 
 import java.awt.*;
 import java.lang.reflect.Field;
+import java.util.*;
 import java.util.List;
 
 import javax.swing.*;
@@ -14,25 +15,83 @@ import javax.swing.border.Border;
 
 import Bean.Enity;
 import Common.Common;
+import Rule.Check;
 import Show.Face;
 import Show.MyPanel;
 import Transfer.InterFace;
 
 public class InterFaceImp implements InterFace {
+    private static Vector<MyEnity> myAims = new Vector<>();
+    private static List<MyEnity> badge = new ArrayList<>();
     private static ImageIcon[] walks = new ImageIcon[2];
+    private static ImageIcon[] left_walks = new ImageIcon[2];
+    private static ImageIcon[] right_walks = new ImageIcon[2];
     private static ImageIcon stand;
+    private static int count = 0;
     private static int step = 0;
     private static boolean first = true;
 
     static {
+        List<Enity> enities = Enity.createAimPoint();
+        for (Enity enity : enities) myAims.add(new MyEnity(enity));
         stand = new ImageIcon("images/player_stand.png");
         for (int i = 0; i < walks.length; ++i) {
-            walks[i] = new ImageIcon("images/player_" + i + ".png");
+            walks[i] = new ImageIcon("images/player_walk_right_" + i + ".png");
+            left_walks[i] = new ImageIcon("images/player_walk_left_" + i + ".png");
+            right_walks[i] = new ImageIcon("images/player_walk_right_" + i + ".png");
+        }
+        bfs();
+        badge.add(new MyEnity(25,14,48));
+        badge.add(new MyEnity(25,13,49));
+        badge.add(new MyEnity(24,12,52));
+        badge.add(new MyEnity(23,11,54));
+        badge.add(new MyEnity(23,10,55));
+        badge.add(new MyEnity(22,9,57));
+        badge.add(new MyEnity(21,8,59));
+        badge.add(new MyEnity(24,8,60));
+        badge.add(new MyEnity(25,8,61));
+        badge.add(new MyEnity(25,7,61));
+//14,25   depth=27 |13,25 d=28 | 12,24 d=30 |11,23 d=32|10,23 d=33|9,22 d=35|8,21 d=36|8,24 d=36 |8,25 d=37|7,25 d=38
+        badge.sort(new MyEnityComparator());
+    }
+
+    private static void bfs() {
+        System.out.println("bfs");
+        LinkedList<MyEnity> que1 = new LinkedList<>();
+        LinkedList<MyEnity> que2 = new LinkedList<>();
+        int[] dx = {1, -1, 0, 0};
+        int[] dy = {0, 0, 1, -1};
+        int depth = 0;
+        que1.add(new MyEnity(10, 10, depth));
+        boolean que1empty = false;
+        boolean[][] marked = new boolean[30][32];
+        while (!que1.isEmpty() || !que2.isEmpty()) {
+            if (que1empty != que1.isEmpty()) depth++;
+            que1empty = que1.isEmpty();
+
+            if (!que1.isEmpty()) {
+                MyEnity enity = que1.pop();
+                marked[enity.getX()][enity.getY()] = true;
+                badge.add(enity);
+                for (int i = 0; i < 4; ++i) {
+                    MyEnity next = new MyEnity(enity.getX() + dx[i], enity.getY() + dy[i], depth + 1);
+                    if (!myAims.contains(next) && !marked[next.getX()][next.getY()]) que2.add(next);
+                }
+            } else {
+                MyEnity enity = que2.pop();
+                badge.add(enity);
+                for (int i = 0; i < 4; ++i) {
+                    MyEnity next = new MyEnity(enity.getX() + dx[i], enity.getY() + dy[i], depth + 1);
+                    if (!myAims.contains(next) && !marked[next.getX()][next.getY()]) que1.add(next);
+                }
+            }
+
         }
     }
 
     // 这个函数是负责画画的。画每个点当前的位置，目标的位置，通过jlabel来定位
     public JLabel[][] draw(List<Enity> now, List<Enity> aim, JLabel[][] jlabel) {
+
         // 这里你们可以把人物以图标的形式展现出来，也可以改善下棋盘框框的样子
 
         // 以下是画画的流程
@@ -58,18 +117,63 @@ public class InterFaceImp implements InterFace {
             for (int i = 0; i < now.size(); i++) {
                 int nx = now.get(i).getX();
                 int ny = now.get(i).getY();
-                if (nx == aim.get(i).getX() && ny == aim.get(i).getY()) {
-                    System.out.println("nx=" + nx + " ny=" + ny
-                            + " ax=" + aim.get(i).getX() + " ay=" + aim.get(i).getY());
-                    jlabel[nx][ny].setIcon(stand);
-                } else
-                    jlabel[nx][ny].setIcon(icon);
+//                if (nx == aim.get(i).getX() && ny == aim.get(i).getY()) {
+//                    System.out.println("nx=" + nx + " ny=" + ny
+//                            + " ax=" + aim.get(i).getX() + " ay=" + aim.get(i).getY());
+//                    jlabel[nx][ny].setIcon(stand);
+//                } else
+                if (aim.get(i).getY() > ny)
+                    jlabel[nx][ny].setIcon(right_walks[step]);
+                else
+                    jlabel[nx][ny].setIcon(left_walks[step]);
+
 //                jlabel[nx][ny].setText(
 //                        jlabel[nx][ny].getText() + " " + now.get(i).getId() + "");
-                jlabel[nx][ny].setBackground(Color.RED);
+                if (first) jlabel[nx][ny].setBackground(Color.RED);
             }
             step = (step + 1) % walks.length;
+            count++;
         }
+        first = false;
+        assert now != null;
+        if (Check.isSuccess(now, aim) && count > 10) {
+            count = 0;
+            first = true;
+            for (int i = 0; i < now.size(); i++) {
+                int nx = now.get(i).getX();
+                int ny = now.get(i).getY();
+                jlabel[nx][ny].setIcon(null);
+                jlabel[nx][ny].setBackground(Color.YELLOW);
+                jlabel[nx][ny].updateUI();
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            int predep = badge.get(0).getDepth();
+            int curdep = 0;
+            for (MyEnity enity : badge) {
+                curdep = enity.getDepth();
+                if (curdep != predep) {
+                    jlabel[enity.getX()][enity.getY()].updateUI();
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                jlabel[enity.getX()][enity.getY()].setBackground(Color.YELLOW);
+                predep = curdep;
+            }
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
         return jlabel;
     }
 
@@ -117,7 +221,7 @@ public class InterFaceImp implements InterFace {
 //        BorderFactory.createEtchedBorder(BorderUIResource.EtchedBorderUIResource.LOWERED,
 //                new Color(Integer.parseInt("660000",16)),
 //                new Color(Integer.parseInt("cc0000",16)));
-        return BorderFactory.createLineBorder(Color.BLACK);
+        return BorderFactory.createLineBorder(Color.BLACK, 1);
     }
 
     // 我直接把框架类扔给你美化吧
@@ -139,6 +243,12 @@ public class InterFaceImp implements InterFace {
 
         face.getContentPane().add(bar);
 
+        JPanel panel = new JPanel();
+        panel.setPreferredSize(new Dimension(face.getWidth(), 200));
+        panel.setBackground(Color.GRAY);
+        face.getContentPane().add(panel,"South");
+
+        face.setResizable(false);
 
         return face;
     }
@@ -161,6 +271,7 @@ public class InterFaceImp implements InterFace {
         bar.setForeground(Color.RED);
         bar.setString(String.valueOf(allTime - count - useTime));
         bar.setStringPainted(true);
+        bar.setMinimumSize(new Dimension(500, 20));
         return bar;
     }
 }
