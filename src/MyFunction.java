@@ -1,4 +1,8 @@
 import Bean.Enity;
+import sun.audio.AudioPlayer;
+import sun.audio.AudioStream;
+
+import java.io.FileInputStream;
 
 import static java.lang.Math.abs;
 
@@ -38,4 +42,19 @@ public class MyFunction {
     static int calLength(Enity e1, Enity e2) {
         return abs(e1.getX() - e2.getX()) + abs(e1.getY() - e2.getY());
     }
+
+
+    private static int num=0;
+    static void playSoundEffect() {
+        try {
+            FileInputStream fileau = new FileInputStream("footsteps/footstep_wood_"+(num%6+1)+".wav");
+            num++;
+            AudioStream as = new AudioStream(fileau);
+            AudioPlayer.player.start(as);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
 }
