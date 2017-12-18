@@ -6,6 +6,9 @@
  */
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.List;
@@ -16,8 +19,7 @@ import javax.swing.border.Border;
 import Bean.Enity;
 import Common.Common;
 import Rule.Check;
-import Show.Face;
-import Show.MyPanel;
+import Show.*;
 import Transfer.InterFace;
 
 public class InterFaceImp implements InterFace {
@@ -26,6 +28,7 @@ public class InterFaceImp implements InterFace {
     private static ImageIcon[] walks = new ImageIcon[2];
     private static ImageIcon[] left_walks = new ImageIcon[2];
     private static ImageIcon[] right_walks = new ImageIcon[2];
+    private static ImageIcon[] allin_image=new ImageIcon[960];
     private static ImageIcon stand;
     private static int count = 0;
     private static int step = 0;
@@ -53,6 +56,11 @@ public class InterFaceImp implements InterFace {
         badge.add(new MyEnity(25,7,61));
 //14,25   depth=27 |13,25 d=28 | 12,24 d=30 |11,23 d=32|10,23 d=33|9,22 d=35|8,21 d=36|8,24 d=36 |8,25 d=37|7,25 d=38
         badge.sort(new MyEnityComparator());
+        for(int i=0;i<960;i++){
+            allin_image[i]=new ImageIcon("allin_png/allin_" + i + ".png");
+        }
+
+
     }
 
     private static void bfs() {
@@ -119,9 +127,9 @@ public class InterFaceImp implements InterFace {
                 int ny = now.get(i).getY();
 
                 if (aim.get(i).getY() > ny)
-                    jlabel[nx][ny].setIcon(right_walks[step]);
+                    jlabel[nx][ny].setIcon(getResizedImageIcon(right_walks[step],jlabel[0][0]));
                 else
-                    jlabel[nx][ny].setIcon(left_walks[step]);
+                    jlabel[nx][ny].setIcon(getResizedImageIcon(left_walks[step],jlabel[0][0]));
 
                 if (first) jlabel[nx][ny].setBackground(Color.RED);
             }
@@ -140,7 +148,7 @@ public class InterFaceImp implements InterFace {
                 jlabel[nx][ny].setBackground(Color.YELLOW);
                 jlabel[nx][ny].updateUI();
                 try {
-                    Thread.sleep(50);
+                    Thread.sleep(30);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -153,7 +161,7 @@ public class InterFaceImp implements InterFace {
                 if (curdep != predep) {
                     jlabel[enity.getX()][enity.getY()].updateUI();
                     try {
-                        Thread.sleep(50);
+                        Thread.sleep(30);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -164,7 +172,7 @@ public class InterFaceImp implements InterFace {
             for(int i=0;i<32;i++)
                 for(int j=0;j<30;j++)
                 {
-                    jlabel[i][j].setIcon(new ImageIcon("allin_png/allin_" + (i*30+j+1) + ".png"));
+                    jlabel[i][j].setIcon(getResizedImageIcon(allin_image[i*30+j],jlabel[0][0]));
                 }
 
 
@@ -178,7 +186,7 @@ public class InterFaceImp implements InterFace {
         return jlabel;
     }
 
-    private ImageIcon getResizedImageIcon(ImageIcon icon, JLabel label) {
+    private static ImageIcon getResizedImageIcon(ImageIcon icon, JLabel label) {
         int imgWidth = icon.getIconWidth();
         int imgHeight = icon.getIconHeight();
         int conWidth = label.getWidth();
@@ -202,14 +210,14 @@ public class InterFaceImp implements InterFace {
                 reImgHeight = imgHeight;
             }
         }
-        //这个是强制缩放到与组件(Label)大小相同
-//        icon = new ImageIcon(icon.getImage()
-//                .getScaledInstance(
-//                        label.getWidth(),
-//                        label.getHeight(),
-//                        Image.SCALE_DEFAULT));
+//        这个是强制缩放到与组件(Label)大小相同
+        icon = new ImageIcon(icon.getImage()
+                .getScaledInstance(
+                        label.getWidth(),
+                        label.getHeight(),
+                        Image.SCALE_DEFAULT));
         //这个是按等比缩放
-        icon = new ImageIcon(icon.getImage().getScaledInstance(reImgWidth, reImgHeight, Image.SCALE_DEFAULT));
+//        icon = new ImageIcon(icon.getImage().getScaledInstance(reImgWidth, reImgHeight, Image.SCALE_DEFAULT));
         return icon;
     }
 
@@ -229,8 +237,15 @@ public class InterFaceImp implements InterFace {
     // 我直接把框架类扔给你美化吧
     public Face setFaceUI(Face face) {
         //这里能对整个游戏的外部框架，菜单栏进行美化，还能添加你觉得需要的其他容器
-        JMenu menu = new JMenu("一般人你tm给我在这里加一个菜单试试！");
-        JMenuItem item = new JMenuItem("撤销");
+        JMenu menu = new JMenu("帮助(H)");
+        menu.setMnemonic('H');
+        JMenuItem item = new JMenuItem("关于");
+        item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, 2));
+        item.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog(null,"杨智添\n丁辰(923779127)\n赵勇\nGithub地址:/MarsDingC/Enity.git","制作人员",JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
         JMenuBar bar = new JMenuBar();
         menu.add(item);
         bar.add(menu);
