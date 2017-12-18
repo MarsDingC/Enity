@@ -45,14 +45,18 @@ public class AudioManager {
             }
             num++;
             clip.open(audioInputStream);
-            FloatControl gainControl =
-                    (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-            gainControl.setValue(-20.0f); // Reduce volume by 10 decibels.
+            setValue(-10.0f);
             clip.start();
             clip.loop(Clip.LOOP_CONTINUOUSLY);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    static void setValue(float value) {
+        FloatControl gainControl =
+                (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+        gainControl.setValue(value); // Reduce volume by 10 decibels.
     }
 
     static void playBGM() throws LineUnavailableException {
@@ -61,5 +65,11 @@ public class AudioManager {
 
     static void stopBGM() throws LineUnavailableException {
         clip.stop();
+    }
+
+    static void restartBGM(){
+        clip.stop();
+        clip.setFramePosition(160000);
+        clip.start();
     }
 }

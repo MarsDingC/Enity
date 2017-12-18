@@ -25,8 +25,6 @@ import Show.*;
 import Transfer.InterFace;
 
 public class InterFaceImp implements InterFace {
-    private static AudioPlayThread playbackThread;
-
     private static Vector<MyEnity> myAims = new Vector<>();
     private static List<MyEnity> badge = new ArrayList<>();
     private static ImageIcon[] walks = new ImageIcon[2];
@@ -34,6 +32,7 @@ public class InterFaceImp implements InterFace {
     private static ImageIcon[] right_walks = new ImageIcon[2];
     private static ImageIcon[] allin_image = new ImageIcon[960];
     private static ImageIcon stand;
+    private JLabel jl1;
     private static int count = 0;
     private static int step = 0;
     private static boolean first = true;
@@ -44,9 +43,9 @@ public class InterFaceImp implements InterFace {
         for (Enity enity : enities) myAims.add(new MyEnity(enity));
         stand = new ImageIcon("images/player_stand.png");
         for (int i = 0; i < walks.length; ++i) {
-            walks[i] = new ImageIcon("images/player_walk_right_" + i + ".png");
-            left_walks[i] = new ImageIcon("images/player_walk_left_" + i + ".png");
-            right_walks[i] = new ImageIcon("images/player_walk_right_" + i + ".png");
+            walks[i] = new ImageIcon("images/player_walk_right_" + (i+1) + ".png");
+            left_walks[i] = new ImageIcon("images/player_walk_left_" + (i+1) + ".png");
+            right_walks[i] = new ImageIcon("images/player_walk_right_" + (i+1) + ".png");
         }
         bfs();
         badge.add(new MyEnity(25, 14, 48));
@@ -65,14 +64,15 @@ public class InterFaceImp implements InterFace {
             allin_image[i] = new ImageIcon("allin_png/allin_" + i + ".png");
         }
 
-
-//        playbackThread = new AudioPlayThread();
-//        playbackThread.start();
         AudioManager.beginBGM();
+        try {
+            AudioManager.stopBGM();
+        } catch (LineUnavailableException e) {
+            e.printStackTrace();
+        }
     }
 
     private static void bfs() {
-        System.out.println("bfs");
         LinkedList<MyEnity> que1 = new LinkedList<>();
         LinkedList<MyEnity> que2 = new LinkedList<>();
         int[] dx = {1, -1, 0, 0};
@@ -110,10 +110,10 @@ public class InterFaceImp implements InterFace {
 
         // 这里你们可以把人物以图标的形式展现出来，也可以改善下棋盘框框的样子
 
+        jl1.setText("当前用时："+Common.getUseTime()+"s       当前碰撞次数：0");
+
         // 以下是画画的流程
         // 1.棋盘清空
-        System.out.println("Width:" + jlabel[0][0].getWidth());
-        System.out.println("Height:" + jlabel[0][0].getHeight());
         for (int i = 0; i < jlabel.length; i++) {
             for (int j = 0; j < jlabel[i].length; j++) {
                 jlabel[i][j].setIcon(null);
@@ -122,6 +122,7 @@ public class InterFaceImp implements InterFace {
             }
         }
         // 2.画目标位置(党徽)
+        if(!first)
         for (int i = 0; i < aim.size(); i++) {
             jlabel[aim.get(i).getX()][aim.get(i).getY()].setBackground(Color.GRAY);
         }
@@ -129,23 +130,28 @@ public class InterFaceImp implements InterFace {
             // 3. 画上现在的每个点的位置，这里可以增加图标
 
             ImageIcon icon = walks[step];
-//            icon = getResizedImageIcon(icon, jlabel[0][0]);
             for (int i = 0; i < now.size(); i++) {
                 int nx = now.get(i).getX();
                 int ny = now.get(i).getY();
 
                 if (first) {
                     jlabel[nx][ny].setBackground(Color.RED);
+                    jlabel[nx][ny].setIcon(getResizedImageIcon(stand, jlabel[0][0]));
+                }else {
+                    if (ny < 15)
+                        jlabel[nx][ny].setIcon(getResizedImageIcon(right_walks[step], jlabel[0][0]));
+                    else
+                        jlabel[nx][ny].setIcon(getResizedImageIcon(left_walks[step], jlabel[0][0]));
                 }
-
-                if (aim.get(i).getY() > ny)
-                    jlabel[nx][ny].setIcon(getResizedImageIcon(right_walks[step], jlabel[0][0]));
-                else
-                    jlabel[nx][ny].setIcon(getResizedImageIcon(left_walks[step], jlabel[0][0]));
-
             }
             step = (step + 1) % walks.length;
             count++;
+        }
+
+        if (first) {
+            AudioManager.setValue(-10.0f);
+            AudioManager.restartBGM();
+            isPaused = false;
         }
         if (!first && !(Check.isSuccess(now, aim) && count > 10))
             AudioManager.playSoundEffect();
@@ -153,6 +159,15 @@ public class InterFaceImp implements InterFace {
         assert now != null;
 
         if (Check.isSuccess(now, aim) && count > 10) {
+            if (!isPaused) {
+                AudioManager.setValue(1.0f);
+                AudioManager.restartBGM();
+            }
+            for (int i = 0; i < now.size(); i++) {
+                int nx = now.get(i).getX();
+                int ny = now.get(i).getY();
+                    jlabel[nx][ny].setIcon(getResizedImageIcon(stand, jlabel[0][0]));
+            }
             count = 0;
             first = true;
             for (int i = 0; i < now.size(); i++) {
@@ -162,7 +177,7 @@ public class InterFaceImp implements InterFace {
                 jlabel[nx][ny].setBackground(Color.YELLOW);
                 jlabel[nx][ny].updateUI();
                 try {
-                    Thread.sleep(30);
+                    Thread.sleep(50);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -175,7 +190,7 @@ public class InterFaceImp implements InterFace {
                 if (curdep != predep) {
                     jlabel[enity.getX()][enity.getY()].updateUI();
                     try {
-                        Thread.sleep(30);
+                        Thread.sleep(50);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -183,11 +198,16 @@ public class InterFaceImp implements InterFace {
                 jlabel[enity.getX()][enity.getY()].setBackground(Color.YELLOW);
                 predep = curdep;
             }
-            for (int i = 0; i < 32; i++)
+            for (int i = 0; i < 32; i++) {
                 for (int j = 0; j < 30; j++) {
                     jlabel[i][j].setIcon(getResizedImageIcon(allin_image[i * 30 + j], jlabel[0][0]));
                 }
-
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
 
 //            try {
 //                Thread.sleep(3000);
@@ -254,7 +274,7 @@ public class InterFaceImp implements InterFace {
         JMenu helpMenu = new JMenu("帮助(H)");
         helpMenu.setMnemonic('H');
         JMenuItem aboutItem = new JMenuItem("关于");
-        aboutItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_MASK));
+        aboutItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.CTRL_MASK));
         aboutItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 JOptionPane.showMessageDialog(null,
@@ -278,10 +298,10 @@ public class InterFaceImp implements InterFace {
                 try {
                     if (!isPaused) {
                         AudioManager.stopBGM();
-                        isPaused=true;
-                    }else{
+                        isPaused = true;
+                    } else {
                         AudioManager.playBGM();
-                        isPaused=false;
+                        isPaused = false;
                     }
 
                 } catch (LineUnavailableException e1) {
@@ -314,6 +334,12 @@ public class InterFaceImp implements InterFace {
         leftPanel.setBackground(Color.RED);
         face.getContentPane().add(leftPanel, "West");
         JPanel bottomPanel = new JPanel();
+
+        jl1 = new JLabel("one in pan1");
+        jl1.setFont(new java.awt.Font("Dialog", Font.PLAIN,   15));
+        jl1.setForeground(Color.WHITE);
+        bottomPanel.add(jl1);
+
         bottomPanel.setPreferredSize(new Dimension(face.getWidth(), 150));
         bottomPanel.setBackground(Color.RED);
         face.getContentPane().add(bottomPanel, "South");
