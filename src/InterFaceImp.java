@@ -140,13 +140,15 @@ public class InterFaceImp implements InterFace {
                 else
                     jlabel[nx][ny].setIcon(getResizedImageIcon(left_walks[step], jlabel[0][0]));
 
-
             }
             step = (step + 1) % walks.length;
             count++;
         }
+        if(!first&&!(Check.isSuccess(now, aim) && count > 10))
+            MyFunction.playSoundEffect();
         first = false;
         assert now != null;
+
         if (Check.isSuccess(now, aim) && count > 10) {
             count = 0;
             first = true;
@@ -190,7 +192,6 @@ public class InterFaceImp implements InterFace {
 //                e.printStackTrace();
 //            }
         }
-
         return jlabel;
     }
 
@@ -219,6 +220,7 @@ public class InterFaceImp implements InterFace {
 //            }
 //        }
 //        这个是强制缩放到与组件(Label)大小相同
+
         if (label.getWidth() != 0 && label.getHeight() != 0)
             icon = new ImageIcon(icon.getImage()
                     .getScaledInstance(
@@ -256,6 +258,7 @@ public class InterFaceImp implements InterFace {
                         "杨智添\n丁辰(923779127)\n赵勇\nGithub地址:/MarsDingC/Enity.git",
                         "制作人员",
                         JOptionPane.INFORMATION_MESSAGE);
+
             }
         });
         JMenuBar bar = new JMenuBar();
@@ -309,8 +312,8 @@ public class InterFaceImp implements InterFace {
         bottomPanel.setBackground(Color.RED);
         face.getContentPane().add(bottomPanel, "South");
 
-        face.setResizable(false);
 
+        face.setResizable(false);
         return face;
     }
 
