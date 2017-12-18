@@ -101,18 +101,6 @@ public class MyEnity extends Enity implements Comparable<MyEnity> {
 
     }
 
-    void setCanMove(int dx, int dy) {
-        if (dx < 0) isCanLeft = false;
-        else if (dx > 0) isCanRight = false;
-        else if (dy < 0) isCanUp = false;
-        else if (dy > 0) isCanDown = false;
-    }
-
-    int getAim() {
-        return aim;
-    }
-
-
 
     int getLength() {
         return length;

@@ -122,12 +122,6 @@ public class InterFaceImp implements InterFace {
                     jlabel[nx][ny].setIcon(right_walks[step]);
                 else
                     jlabel[nx][ny].setIcon(left_walks[step]);
-                if (MyFunction.pong(now.get(i),aim.get(i))) {
-                    MyFunction.printEnityXY(now.get(i));
-                    MyFunction.printEnityXY(aim.get(i));
-                    jlabel[nx][ny].setIcon(stand);
-                } else
-                    jlabel[nx][ny].setIcon(icon);
 
                 if (first) jlabel[nx][ny].setBackground(Color.RED);
             }
@@ -159,7 +153,7 @@ public class InterFaceImp implements InterFace {
                 if (curdep != predep) {
                     jlabel[enity.getX()][enity.getY()].updateUI();
                     try {
-                        Thread.sleep(100);
+                        Thread.sleep(50);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -167,11 +161,18 @@ public class InterFaceImp implements InterFace {
                 jlabel[enity.getX()][enity.getY()].setBackground(Color.YELLOW);
                 predep = curdep;
             }
-            try {
-                Thread.sleep(3000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            for(int i=0;i<32;i++)
+                for(int j=0;j<30;j++)
+                {
+                    jlabel[i][j].setIcon(new ImageIcon("allin_png/allin_" + (i*30+j+1) + ".png"));
+                }
+
+
+//            try {
+//                Thread.sleep(3000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
         }
 
         return jlabel;
@@ -221,7 +222,8 @@ public class InterFaceImp implements InterFace {
 //        BorderFactory.createEtchedBorder(BorderUIResource.EtchedBorderUIResource.LOWERED,
 //                new Color(Integer.parseInt("660000",16)),
 //                new Color(Integer.parseInt("cc0000",16)));
-        return BorderFactory.createLineBorder(Color.BLACK, 1);
+//        return BorderFactory.createLineBorder(Color.RED, 1);
+        return null;
     }
 
     // 我直接把框架类扔给你美化吧
@@ -243,10 +245,20 @@ public class InterFaceImp implements InterFace {
 
         face.getContentPane().add(bar);
 
-        JPanel panel = new JPanel();
-        panel.setPreferredSize(new Dimension(face.getWidth(), 200));
-        panel.setBackground(Color.GRAY);
-        face.getContentPane().add(panel,"South");
+
+        JPanel rightPanel = new JPanel();
+        rightPanel.setPreferredSize(new Dimension(100, face.getHeight()));
+        rightPanel.setBackground(Color.RED);
+        face.getContentPane().add(rightPanel,"East");
+        JPanel leftPanel = new JPanel();
+        leftPanel.setPreferredSize(new Dimension(100, face.getHeight()));
+        leftPanel.setBackground(Color.RED);
+        face.getContentPane().add(leftPanel,"West");
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setPreferredSize(new Dimension(face.getWidth(), 150));
+        bottomPanel.setBackground(Color.RED);
+        face.getContentPane().add(bottomPanel,"South");
+
 
         face.setResizable(false);
 
@@ -255,8 +267,8 @@ public class InterFaceImp implements InterFace {
 
     // 我直接把棋盘类扔给你。让你美化算了
     public MyPanel setJPanelUI(MyPanel myPanel) {
-        //这里能对棋盘jpanel进行美化
-
+        //这里能对棋盘jpanel进行美化'
+        myPanel.setBackground( Color.red);
         return myPanel;
     }
 
@@ -269,7 +281,7 @@ public class InterFaceImp implements InterFace {
         int useTime = Common.getUseTime();// 游戏已用时间
         bar.setBackground(Color.GRAY);
         bar.setForeground(Color.RED);
-        bar.setString(String.valueOf(allTime - count - useTime));
+        bar.setString(String.valueOf(allTime - count - useTime-1));
         bar.setStringPainted(true);
         bar.setMinimumSize(new Dimension(500, 20));
         return bar;

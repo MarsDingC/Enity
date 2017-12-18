@@ -9,6 +9,7 @@ public class MyFunction {
 
     /**
      * 通过分别比较两点X、Y轴坐标判断两点是否碰撞
+     *
      * @param e1
      * @param e2
      * @return
@@ -19,15 +20,17 @@ public class MyFunction {
 
     /**
      * 输出该Enity的坐标
+     *
      * @param e1
      */
-    static void printEnityXY(Enity e1){
-        System.out.println("("+e1.getX()+","+e1.getY()+")");
+    static void printEnityXY(Enity e1) {
+        System.out.println("(" + e1.getX() + "," + e1.getY() + ")");
     }
 
 
     /**
      * 计算两点之间的路径长度
+     *
      * @param e1
      * @param e2
      * @return
