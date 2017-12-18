@@ -23,6 +23,8 @@ import Show.*;
 import Transfer.InterFace;
 
 public class InterFaceImp implements InterFace {
+    private static AudioPlayThread playbackThread;
+
     private static Vector<MyEnity> myAims = new Vector<>();
     private static List<MyEnity> badge = new ArrayList<>();
     private static ImageIcon[] walks = new ImageIcon[2];
@@ -60,6 +62,9 @@ public class InterFaceImp implements InterFace {
             allin_image[i] = new ImageIcon("allin_png/allin_" + i + ".png");
         }
 
+
+        playbackThread = new AudioPlayThread();
+        playbackThread.start();
 
     }
 
@@ -126,12 +131,15 @@ public class InterFaceImp implements InterFace {
                 int nx = now.get(i).getX();
                 int ny = now.get(i).getY();
 
+                if (first) {
+                    jlabel[nx][ny].setBackground(Color.RED);
+                }
+
                 if (aim.get(i).getY() > ny)
                     jlabel[nx][ny].setIcon(getResizedImageIcon(right_walks[step], jlabel[0][0]));
                 else
                     jlabel[nx][ny].setIcon(getResizedImageIcon(left_walks[step], jlabel[0][0]));
 
-                if (first) jlabel[nx][ny].setBackground(Color.RED);
             }
             step = (step + 1) % walks.length;
             count++;
@@ -240,18 +248,45 @@ public class InterFaceImp implements InterFace {
     // 我直接把框架类扔给你美化吧
     public Face setFaceUI(Face face) {
         //这里能对整个游戏的外部框架，菜单栏进行美化，还能添加你觉得需要的其他容器
-        JMenu menu = new JMenu("帮助(H)");
-        menu.setMnemonic('H');
-        JMenuItem item = new JMenuItem("关于");
-        item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, 2));
-        item.addActionListener(new ActionListener() {
+        JMenu helpMenu = new JMenu("帮助(H)");
+        helpMenu.setMnemonic('H');
+        JMenuItem aboutItem = new JMenuItem("关于");
+        aboutItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, 2));
+        aboutItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(null, "杨智添\n丁辰(923779127)\n赵勇\nGithub地址:/MarsDingC/Enity.git", "制作人员", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(null,
+                        "杨智添\n丁辰(923779127)\n赵勇\nGithub地址:/MarsDingC/Enity.git",
+                        "制作人员",
+                        JOptionPane.INFORMATION_MESSAGE);
+
             }
         });
         JMenuBar bar = new JMenuBar();
-        menu.add(item);
-        bar.add(menu);
+        helpMenu.add(aboutItem);
+        bar.add(helpMenu);
+
+        JMenu musicMenu = new JMenu("音乐(M)");
+        musicMenu.setMnemonic('M');
+        JMenuItem pauseItem = new JMenuItem("暂停");
+        JMenuItem resumeItem = new JMenuItem("继续");
+
+        pauseItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                playbackThread.musicPause();
+            }
+        });
+
+        resumeItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                playbackThread.musicResume();
+            }
+        });
+
+        musicMenu.add(pauseItem);
+        musicMenu.add(resumeItem);
+        bar.add(musicMenu);
         try {
             Class<?> cls = Class.forName("Show.Face");
             Field menuBar = cls.getDeclaredField("menuBar");
