@@ -2,7 +2,10 @@ import Bean.Enity;
 import sun.audio.AudioPlayer;
 import sun.audio.AudioStream;
 
+import javax.sound.sampled.*;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 
 import static java.lang.Math.abs;
 
@@ -10,6 +13,9 @@ import static java.lang.Math.abs;
  * Created by 92377 on 2017/12/13.
  */
 public class MyFunction {
+
+
+
 
     /**
      * 通过分别比较两点X、Y轴坐标判断两点是否碰撞
@@ -44,17 +50,10 @@ public class MyFunction {
     }
 
 
-    private static int num=0;
-    static void playSoundEffect() {
-        try {
-            FileInputStream fileau = new FileInputStream("footsteps/footstep_wood_"+(num%6+1)+".wav");
-            num++;
-            AudioStream as = new AudioStream(fileau);
-            AudioPlayer.player.start(as);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+
+
+
+
 
 
 }

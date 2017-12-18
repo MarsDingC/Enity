@@ -8,11 +8,13 @@
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.List;
 
+import javax.sound.sampled.LineUnavailableException;
 import javax.swing.*;
 import javax.swing.border.Border;
 
@@ -35,6 +37,7 @@ public class InterFaceImp implements InterFace {
     private static int count = 0;
     private static int step = 0;
     private static boolean first = true;
+    boolean isPaused = false;
 
     static {
         List<Enity> enities = Enity.createAimPoint();
@@ -63,9 +66,9 @@ public class InterFaceImp implements InterFace {
         }
 
 
-        playbackThread = new AudioPlayThread();
-        playbackThread.start();
-
+//        playbackThread = new AudioPlayThread();
+//        playbackThread.start();
+        AudioManager.beginBGM();
     }
 
     private static void bfs() {
@@ -144,8 +147,8 @@ public class InterFaceImp implements InterFace {
             step = (step + 1) % walks.length;
             count++;
         }
-        if(!first&&!(Check.isSuccess(now, aim) && count > 10))
-            MyFunction.playSoundEffect();
+        if (!first && !(Check.isSuccess(now, aim) && count > 10))
+            AudioManager.playSoundEffect();
         first = false;
         assert now != null;
 
@@ -251,7 +254,7 @@ public class InterFaceImp implements InterFace {
         JMenu helpMenu = new JMenu("帮助(H)");
         helpMenu.setMnemonic('H');
         JMenuItem aboutItem = new JMenuItem("关于");
-        aboutItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, 2));
+        aboutItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_MASK));
         aboutItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 JOptionPane.showMessageDialog(null,
@@ -267,25 +270,28 @@ public class InterFaceImp implements InterFace {
 
         JMenu musicMenu = new JMenu("音乐(M)");
         musicMenu.setMnemonic('M');
-        JMenuItem pauseItem = new JMenuItem("暂停");
-        JMenuItem resumeItem = new JMenuItem("继续");
-
-        pauseItem.addActionListener(new ActionListener() {
+        JMenuItem ctrlItem = new JMenuItem("暂停/继续");
+        ctrlItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_MASK));
+        ctrlItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                playbackThread.musicPause();
+                try {
+                    if (!isPaused) {
+                        AudioManager.stopBGM();
+                        isPaused=true;
+                    }else{
+                        AudioManager.playBGM();
+                        isPaused=false;
+                    }
+
+                } catch (LineUnavailableException e1) {
+                    e1.printStackTrace();
+                }
             }
         });
 
-        resumeItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                playbackThread.musicResume();
-            }
-        });
 
-        musicMenu.add(pauseItem);
-        musicMenu.add(resumeItem);
+        musicMenu.add(ctrlItem);
         bar.add(musicMenu);
         try {
             Class<?> cls = Class.forName("Show.Face");

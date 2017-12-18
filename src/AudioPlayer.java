@@ -17,7 +17,7 @@ public class AudioPlayer {
 			throws UnsupportedAudioFileException, IOException,
 			LineUnavailableException {
 
-        String audioFilePath = "E:\\JavaDesignPattern\\Enity\\bb.mp3";
+        String audioFilePath = "bgm.mp3";
 
         File file = new File(audioFilePath);
 
