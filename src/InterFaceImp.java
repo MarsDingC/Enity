@@ -23,12 +23,14 @@ import Show.*;
 import Transfer.InterFace;
 
 public class InterFaceImp implements InterFace {
+    private static AudioPlayThread playbackThread;
+
     private static Vector<MyEnity> myAims = new Vector<>();
     private static List<MyEnity> badge = new ArrayList<>();
     private static ImageIcon[] walks = new ImageIcon[2];
     private static ImageIcon[] left_walks = new ImageIcon[2];
     private static ImageIcon[] right_walks = new ImageIcon[2];
-    private static ImageIcon[] allin_image=new ImageIcon[960];
+    private static ImageIcon[] allin_image = new ImageIcon[960];
     private static ImageIcon stand;
     private static int count = 0;
     private static int step = 0;
@@ -44,22 +46,25 @@ public class InterFaceImp implements InterFace {
             right_walks[i] = new ImageIcon("images/player_walk_right_" + i + ".png");
         }
         bfs();
-        badge.add(new MyEnity(25,14,48));
-        badge.add(new MyEnity(25,13,49));
-        badge.add(new MyEnity(24,12,52));
-        badge.add(new MyEnity(23,11,54));
-        badge.add(new MyEnity(23,10,55));
-        badge.add(new MyEnity(22,9,57));
-        badge.add(new MyEnity(21,8,59));
-        badge.add(new MyEnity(24,8,60));
-        badge.add(new MyEnity(25,8,61));
-        badge.add(new MyEnity(25,7,61));
+        badge.add(new MyEnity(25, 14, 48));
+        badge.add(new MyEnity(25, 13, 49));
+        badge.add(new MyEnity(24, 12, 52));
+        badge.add(new MyEnity(23, 11, 54));
+        badge.add(new MyEnity(23, 10, 55));
+        badge.add(new MyEnity(22, 9, 57));
+        badge.add(new MyEnity(21, 8, 59));
+        badge.add(new MyEnity(24, 8, 60));
+        badge.add(new MyEnity(25, 8, 61));
+        badge.add(new MyEnity(25, 7, 61));
 //14,25   depth=27 |13,25 d=28 | 12,24 d=30 |11,23 d=32|10,23 d=33|9,22 d=35|8,21 d=36|8,24 d=36 |8,25 d=37|7,25 d=38
         badge.sort(new MyEnityComparator());
-        for(int i=0;i<960;i++){
-            allin_image[i]=new ImageIcon("allin_png/allin_" + i + ".png");
+        for (int i = 0; i < 960; i++) {
+            allin_image[i] = new ImageIcon("allin_png/allin_" + i + ".png");
         }
 
+
+        playbackThread = new AudioPlayThread();
+        playbackThread.start();
 
     }
 
@@ -126,12 +131,16 @@ public class InterFaceImp implements InterFace {
                 int nx = now.get(i).getX();
                 int ny = now.get(i).getY();
 
-                if (aim.get(i).getY() > ny)
-                    jlabel[nx][ny].setIcon(getResizedImageIcon(right_walks[step],jlabel[0][0]));
-                else
-                    jlabel[nx][ny].setIcon(getResizedImageIcon(left_walks[step],jlabel[0][0]));
+                if (first) {
+                    jlabel[nx][ny].setBackground(Color.RED);
+                }
 
-                if (first) jlabel[nx][ny].setBackground(Color.RED);
+                if (aim.get(i).getY() > ny)
+                    jlabel[nx][ny].setIcon(getResizedImageIcon(right_walks[step], jlabel[0][0]));
+                else
+                    jlabel[nx][ny].setIcon(getResizedImageIcon(left_walks[step], jlabel[0][0]));
+
+
             }
             step = (step + 1) % walks.length;
             count++;
@@ -169,10 +178,9 @@ public class InterFaceImp implements InterFace {
                 jlabel[enity.getX()][enity.getY()].setBackground(Color.YELLOW);
                 predep = curdep;
             }
-            for(int i=0;i<32;i++)
-                for(int j=0;j<30;j++)
-                {
-                    jlabel[i][j].setIcon(getResizedImageIcon(allin_image[i*30+j],jlabel[0][0]));
+            for (int i = 0; i < 32; i++)
+                for (int j = 0; j < 30; j++) {
+                    jlabel[i][j].setIcon(getResizedImageIcon(allin_image[i * 30 + j], jlabel[0][0]));
                 }
 
 
@@ -187,35 +195,36 @@ public class InterFaceImp implements InterFace {
     }
 
     private static ImageIcon getResizedImageIcon(ImageIcon icon, JLabel label) {
-        int imgWidth = icon.getIconWidth();
-        int imgHeight = icon.getIconHeight();
-        int conWidth = label.getWidth();
-        int conHeight = label.getHeight();
-        int reImgWidth;
-        int reImgHeight;
-        if (imgWidth / imgHeight >= conWidth / conHeight) {
-            if (imgWidth > conWidth) {
-                reImgWidth = conWidth;
-                reImgHeight = imgHeight * reImgWidth / imgWidth;
-            } else {
-                reImgWidth = imgWidth;
-                reImgHeight = imgHeight;
-            }
-        } else {
-            if (imgWidth > conWidth) {
-                reImgHeight = conHeight;
-                reImgWidth = imgWidth * reImgHeight / imgHeight;
-            } else {
-                reImgWidth = imgWidth;
-                reImgHeight = imgHeight;
-            }
-        }
+//        int imgWidth = icon.getIconWidth();
+//        int imgHeight = icon.getIconHeight();
+//        int conWidth = label.getWidth();
+//        int conHeight = label.getHeight();
+//        int reImgWidth;
+//        int reImgHeight;
+//        if (imgWidth / imgHeight >= conWidth / conHeight) {
+//            if (imgWidth > conWidth) {
+//                reImgWidth = conWidth;
+//                reImgHeight = imgHeight * reImgWidth / imgWidth;
+//            } else {
+//                reImgWidth = imgWidth;
+//                reImgHeight = imgHeight;
+//            }
+//        } else {
+//            if (imgWidth > conWidth) {
+//                reImgHeight = conHeight;
+//                reImgWidth = imgWidth * reImgHeight / imgHeight;
+//            } else {
+//                reImgWidth = imgWidth;
+//                reImgHeight = imgHeight;
+//            }
+//        }
 //        这个是强制缩放到与组件(Label)大小相同
-        icon = new ImageIcon(icon.getImage()
-                .getScaledInstance(
-                        label.getWidth(),
-                        label.getHeight(),
-                        Image.SCALE_DEFAULT));
+        if (label.getWidth() != 0 && label.getHeight() != 0)
+            icon = new ImageIcon(icon.getImage()
+                    .getScaledInstance(
+                            label.getWidth(),
+                            label.getHeight(),
+                            Image.SCALE_DEFAULT));
         //这个是按等比缩放
 //        icon = new ImageIcon(icon.getImage().getScaledInstance(reImgWidth, reImgHeight, Image.SCALE_DEFAULT));
         return icon;
@@ -237,18 +246,44 @@ public class InterFaceImp implements InterFace {
     // 我直接把框架类扔给你美化吧
     public Face setFaceUI(Face face) {
         //这里能对整个游戏的外部框架，菜单栏进行美化，还能添加你觉得需要的其他容器
-        JMenu menu = new JMenu("帮助(H)");
-        menu.setMnemonic('H');
-        JMenuItem item = new JMenuItem("关于");
-        item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, 2));
-        item.addActionListener(new ActionListener() {
+        JMenu helpMenu = new JMenu("帮助(H)");
+        helpMenu.setMnemonic('H');
+        JMenuItem aboutItem = new JMenuItem("关于");
+        aboutItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, 2));
+        aboutItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(null,"杨智添\n丁辰(923779127)\n赵勇\nGithub地址:/MarsDingC/Enity.git","制作人员",JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(null,
+                        "杨智添\n丁辰(923779127)\n赵勇\nGithub地址:/MarsDingC/Enity.git",
+                        "制作人员",
+                        JOptionPane.INFORMATION_MESSAGE);
             }
         });
         JMenuBar bar = new JMenuBar();
-        menu.add(item);
-        bar.add(menu);
+        helpMenu.add(aboutItem);
+        bar.add(helpMenu);
+
+        JMenu musicMenu = new JMenu("音乐(M)");
+        musicMenu.setMnemonic('M');
+        JMenuItem pauseItem = new JMenuItem("暂停");
+        JMenuItem resumeItem = new JMenuItem("继续");
+
+        pauseItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                playbackThread.musicPause();
+            }
+        });
+
+        resumeItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                playbackThread.musicResume();
+            }
+        });
+
+        musicMenu.add(pauseItem);
+        musicMenu.add(resumeItem);
+        bar.add(musicMenu);
         try {
             Class<?> cls = Class.forName("Show.Face");
             Field menuBar = cls.getDeclaredField("menuBar");
@@ -264,16 +299,15 @@ public class InterFaceImp implements InterFace {
         JPanel rightPanel = new JPanel();
         rightPanel.setPreferredSize(new Dimension(100, face.getHeight()));
         rightPanel.setBackground(Color.RED);
-        face.getContentPane().add(rightPanel,"East");
+        face.getContentPane().add(rightPanel, "East");
         JPanel leftPanel = new JPanel();
         leftPanel.setPreferredSize(new Dimension(100, face.getHeight()));
         leftPanel.setBackground(Color.RED);
-        face.getContentPane().add(leftPanel,"West");
+        face.getContentPane().add(leftPanel, "West");
         JPanel bottomPanel = new JPanel();
         bottomPanel.setPreferredSize(new Dimension(face.getWidth(), 150));
         bottomPanel.setBackground(Color.RED);
-        face.getContentPane().add(bottomPanel,"South");
-
+        face.getContentPane().add(bottomPanel, "South");
 
         face.setResizable(false);
 
@@ -283,7 +317,7 @@ public class InterFaceImp implements InterFace {
     // 我直接把棋盘类扔给你。让你美化算了
     public MyPanel setJPanelUI(MyPanel myPanel) {
         //这里能对棋盘jpanel进行美化'
-        myPanel.setBackground( Color.red);
+        myPanel.setBackground(Color.red);
         return myPanel;
     }
 
@@ -296,7 +330,7 @@ public class InterFaceImp implements InterFace {
         int useTime = Common.getUseTime();// 游戏已用时间
         bar.setBackground(Color.GRAY);
         bar.setForeground(Color.RED);
-        bar.setString(String.valueOf(allTime - count - useTime-1));
+        bar.setString(String.valueOf(allTime - count - useTime - 1));
         bar.setStringPainted(true);
         bar.setMinimumSize(new Dimension(500, 20));
         return bar;
