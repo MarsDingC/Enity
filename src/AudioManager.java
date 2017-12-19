@@ -1,19 +1,20 @@
 import javax.sound.sampled.*;
 import java.io.File;
+import java.util.Random;
 
 /**
  * Created by MarsDingC on 2017/12/18.
  */
 public class AudioManager {
 
-    private static int num = 0;
     private static Clip clip;
 
     static void playSoundEffect() {
         try {
+            Random rd=new Random();
+            int num=rd.nextInt(4);
             AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(
-                    new File("footsteps/footstep_concrete_" + (num % 4 + 1) + ".wav"));
-            num++;
+                    new File("footsteps/footstep_concrete_" + (num+1)+ ".wav"));
             Clip clip = AudioSystem.getClip();
             clip.open(audioInputStream);
             FloatControl gainControl =
@@ -36,7 +37,6 @@ public class AudioManager {
                 audioInputStream = AudioSystem.getAudioInputStream(audioFormat, audioInputStream);
             }
             clip = AudioSystem.getClip();
-            num++;
             clip.open(audioInputStream);
             setValue(-5.0f);
             clip.start();

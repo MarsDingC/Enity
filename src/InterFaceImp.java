@@ -44,9 +44,9 @@ public class InterFaceImp implements InterFace {
         for (Enity enity : enities) myAims.add(new MyEnity(enity));
         stand = new ImageIcon("images/player_stand.png");
         for (int i = 0; i < walks.length; ++i) {
-            walks[i] = new ImageIcon("images/player_walk_right_" + (i+1) + ".png");
-            left_walks[i] = new ImageIcon("images/player_walk_left_" + (i+1) + ".png");
-            right_walks[i] = new ImageIcon("images/player_walk_right_" + (i+1) + ".png");
+            walks[i] = new ImageIcon("images/player_walk_right_" + (i + 1) + ".png");
+            left_walks[i] = new ImageIcon("images/player_walk_left_" + (i + 1) + ".png");
+            right_walks[i] = new ImageIcon("images/player_walk_right_" + (i + 1) + ".png");
         }
         bfs();
         badge.add(new MyEnity(25, 14, 48));
@@ -61,7 +61,7 @@ public class InterFaceImp implements InterFace {
         badge.add(new MyEnity(25, 7, 61));
         badge.sort(new MyEnityComparator());
         for (int i = 0; i < 960; i++) {
-            allin_image[i] = new ImageIcon("allin_png/allin_" + i + ".png");
+            allin_image[i] = new ImageIcon("images_allin/allin_" + i + ".png");
         }
 
         AudioManager.beginBGM();
@@ -111,9 +111,10 @@ public class InterFaceImp implements InterFace {
 
         // 这里你们可以把人物以图标的形式展现出来，也可以改善下棋盘框框的样子
 
-        jl1.setText("当前用时："+Common.getUseTime()+"s       \n当前碰撞次数：0");
-        jbar1.setValue(MyFunction.countSuccess(now, aim));
-        jbar1.setString(MyFunction.countSuccess(now, aim)+"/105");
+        jl1.setText("当前用时：" + Common.getUseTime() + "s       \n当前碰撞次数：0");
+        int numOfSuccess=MyFunction.countSuccess(now, aim);
+        jbar1.setValue(numOfSuccess);
+        jbar1.setString(numOfSuccess + "/105");
         setColorByValue();
 
 
@@ -127,10 +128,10 @@ public class InterFaceImp implements InterFace {
             }
         }
         // 2.画目标位置(党徽)
-        if(!first)
-        for (int i = 0; i < aim.size(); i++) {
-            jlabel[aim.get(i).getX()][aim.get(i).getY()].setBackground(Color.GRAY);
-        }
+        if (!first)
+            for (int i = 0; i < aim.size(); i++) {
+                jlabel[aim.get(i).getX()][aim.get(i).getY()].setBackground(Color.GRAY);
+            }
         if (now != null) {
             // 3. 画上现在的每个点的位置，这里可以增加图标
             for (int i = 0; i < now.size(); i++) {
@@ -140,7 +141,7 @@ public class InterFaceImp implements InterFace {
                 if (first) {
                     jlabel[nx][ny].setBackground(Color.RED);
                     jlabel[nx][ny].setIcon(getResizedImageIcon(stand, jlabel[0][0]));
-                }else {
+                } else {
                     if (ny < 15)
                         jlabel[nx][ny].setIcon(getResizedImageIcon(right_walks[step], jlabel[0][0]));
                     else
@@ -156,8 +157,11 @@ public class InterFaceImp implements InterFace {
             AudioManager.restartBGM();
             isPaused = false;
         }
-        if (!first && !(Check.isSuccess(now, aim) && count > 10))
-            AudioManager.playSoundEffect();
+        if (!first && !Check.isSuccess(now, aim)&&count>2 ) {
+            for(int i=0;i<(105-numOfSuccess)/10.0;i++){
+                AudioManager.playSoundEffect();
+            }
+        }
         first = false;
         assert now != null;
         if (Check.isSuccess(now, aim) && count > 10) {
@@ -168,7 +172,7 @@ public class InterFaceImp implements InterFace {
             for (int i = 0; i < now.size(); i++) {
                 int nx = now.get(i).getX();
                 int ny = now.get(i).getY();
-                    jlabel[nx][ny].setIcon(getResizedImageIcon(stand, jlabel[0][0]));
+                jlabel[nx][ny].setIcon(getResizedImageIcon(stand, jlabel[0][0]));
             }
             count = 0;
             first = true;
@@ -205,7 +209,7 @@ public class InterFaceImp implements InterFace {
                     jlabel[i][j].setIcon(getResizedImageIcon(allin_image[i * 30 + j], jlabel[0][0]));
                 }
                 try {
-                    Thread.sleep(50);
+                    Thread.sleep(40);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -216,11 +220,11 @@ public class InterFaceImp implements InterFace {
     }
 
     private void setColorByValue() {
-        int colorG=(int)(255*(1-jbar1.getValue()/105.0));
-        if(!first&&jbar1.getValue()>80)
+        int colorG = (int) (255 * (1 - jbar1.getValue() / 105.0));
+        if (!first && jbar1.getValue() > 80)
             jbar1.setForeground(Color.RED);
         else {
-            jbar1.setForeground(new Color(255, colorG,0));
+            jbar1.setForeground(new Color(255, colorG, 0));
         }
     }
 
@@ -311,15 +315,14 @@ public class InterFaceImp implements InterFace {
         face.getContentPane().add(leftPanel, "West");
 
 
-
         JPanel bottomPanel = new JPanel(new BorderLayout());
         jl1 = new JLabel("one in pan1");
-        jl1.setFont(new java.awt.Font("Dialog", Font.PLAIN,   15));
+        jl1.setFont(new java.awt.Font("Dialog", Font.PLAIN, 15));
         jl1.setForeground(Color.WHITE);
         jl1.setVerticalAlignment(SwingConstants.BOTTOM);
-        UIManager.put("ProgressBar.selectionForeground",Color.WHITE);
-        UIManager.put("ProgressBar.selectionBackground",Color.WHITE);
-        jbar1=new JProgressBar(0);
+        UIManager.put("ProgressBar.selectionForeground", Color.WHITE);
+        UIManager.put("ProgressBar.selectionBackground", Color.WHITE);
+        jbar1 = new JProgressBar(0);
         jbar1.setMinimum(0);
         jbar1.setMaximum(105);
         jbar1.setValue(0);
@@ -328,8 +331,8 @@ public class InterFaceImp implements InterFace {
         jbar1.setString(String.valueOf(0));
         jbar1.setStringPainted(true);
 
-        bottomPanel.add(jl1,BorderLayout.CENTER);
-        bottomPanel.add(jbar1,BorderLayout.SOUTH);
+        bottomPanel.add(jl1, BorderLayout.CENTER);
+        bottomPanel.add(jbar1, BorderLayout.SOUTH);
 
         bottomPanel.setPreferredSize(new Dimension(face.getWidth(), 150));
         bottomPanel.setBackground(Color.RED);
@@ -358,7 +361,7 @@ public class InterFaceImp implements InterFace {
         int useTime = Common.getUseTime();// 游戏已用时间
         bar.setBackground(Color.GRAY);
         bar.setForeground(Color.RED);
-        bar.setString(String.valueOf(allTime - count - useTime - 1)+"/250");
+        bar.setString(String.valueOf(allTime - count - useTime - 1) + "/250");
         bar.setStringPainted(true);
         bar.setMinimumSize(new Dimension(500, 20));
         return bar;
