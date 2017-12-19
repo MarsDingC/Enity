@@ -3,7 +3,7 @@ import Bean.Enity;
 import static java.lang.Math.abs;
 
 /**
- * Created by 92377 on 2017/12/8.
+ * Created by MarsDingC on 2017/12/8.
  */
 public class MyEnity extends Enity implements Comparable<MyEnity> {
     private int depth;

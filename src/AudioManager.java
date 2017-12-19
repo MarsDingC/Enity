@@ -2,20 +2,12 @@ import javax.sound.sampled.*;
 import java.io.File;
 
 /**
- * Created by 92377 on 2017/12/18.
+ * Created by MarsDingC on 2017/12/18.
  */
 public class AudioManager {
 
     private static int num = 0;
-    static Clip clip;
-
-    static {
-        try {
-            clip = AudioSystem.getClip();
-        } catch (LineUnavailableException e) {
-            e.printStackTrace();
-        }
-    }
+    private static Clip clip;
 
     static void playSoundEffect() {
         try {
@@ -43,6 +35,7 @@ public class AudioManager {
                 audioFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, audioFormat.getSampleRate(), 16, audioFormat.getChannels(), audioFormat.getChannels() * 2, audioFormat.getSampleRate(), audioFormat.isBigEndian());
                 audioInputStream = AudioSystem.getAudioInputStream(audioFormat, audioInputStream);
             }
+            clip = AudioSystem.getClip();
             num++;
             clip.open(audioInputStream);
             setValue(-5.0f);
@@ -56,7 +49,7 @@ public class AudioManager {
     static void setValue(float value) {
         FloatControl gainControl =
                 (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-        gainControl.setValue(value); // Reduce volume by 10 decibels.
+        gainControl.setValue(value);
     }
 
     static void playBGM() throws LineUnavailableException {

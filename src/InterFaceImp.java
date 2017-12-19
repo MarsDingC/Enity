@@ -37,7 +37,7 @@ public class InterFaceImp implements InterFace {
     private static int count = 0;
     private static int step = 0;
     private static boolean first = true;
-    boolean isPaused = false;
+    private boolean isPaused = false;
 
     static {
         List<Enity> enities = Enity.createAimPoint();
@@ -59,7 +59,6 @@ public class InterFaceImp implements InterFace {
         badge.add(new MyEnity(24, 8, 60));
         badge.add(new MyEnity(25, 8, 61));
         badge.add(new MyEnity(25, 7, 61));
-//14,25   depth=27 |13,25 d=28 | 12,24 d=30 |11,23 d=32|10,23 d=33|9,22 d=35|8,21 d=36|8,24 d=36 |8,25 d=37|7,25 d=38
         badge.sort(new MyEnityComparator());
         for (int i = 0; i < 960; i++) {
             allin_image[i] = new ImageIcon("allin_png/allin_" + i + ".png");
@@ -73,6 +72,7 @@ public class InterFaceImp implements InterFace {
         }
     }
 
+    //广度优先搜索
     private static void bfs() {
         LinkedList<MyEnity> que1 = new LinkedList<>();
         LinkedList<MyEnity> que2 = new LinkedList<>();
@@ -114,15 +114,7 @@ public class InterFaceImp implements InterFace {
         jl1.setText("当前用时："+Common.getUseTime()+"s       \n当前碰撞次数：0");
         jbar1.setValue(MyFunction.countSuccess(now, aim));
         jbar1.setString(MyFunction.countSuccess(now, aim)+"/105");
-
-        if(!first&&jbar1.getValue()>80)
-            jbar1.setForeground(Color.RED);
-        else if(jbar1.getValue()<20)
-            jbar1.setForeground(Color.YELLOW);
-        else if(jbar1.getValue()<40)
-            jbar1.setForeground(new Color(255,170,0));
-        else if(jbar1.getValue()<60)
-            jbar1.setForeground(new Color(255,85,0));
+        setColorByValue();
 
 
         // 以下是画画的流程
@@ -141,8 +133,6 @@ public class InterFaceImp implements InterFace {
         }
         if (now != null) {
             // 3. 画上现在的每个点的位置，这里可以增加图标
-
-            ImageIcon icon = walks[step];
             for (int i = 0; i < now.size(); i++) {
                 int nx = now.get(i).getX();
                 int ny = now.get(i).getY();
@@ -170,7 +160,6 @@ public class InterFaceImp implements InterFace {
             AudioManager.playSoundEffect();
         first = false;
         assert now != null;
-
         if (Check.isSuccess(now, aim) && count > 10) {
             if (!isPaused) {
                 AudioManager.setValue(1.0f);
@@ -222,48 +211,28 @@ public class InterFaceImp implements InterFace {
                 }
             }
 
-//            try {
-//                Thread.sleep(3000);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
         }
         return jlabel;
     }
 
-    private static ImageIcon getResizedImageIcon(ImageIcon icon, JLabel label) {
-//        int imgWidth = icon.getIconWidth();
-//        int imgHeight = icon.getIconHeight();
-//        int conWidth = label.getWidth();
-//        int conHeight = label.getHeight();
-//        int reImgWidth;
-//        int reImgHeight;
-//        if (imgWidth / imgHeight >= conWidth / conHeight) {
-//            if (imgWidth > conWidth) {
-//                reImgWidth = conWidth;
-//                reImgHeight = imgHeight * reImgWidth / imgWidth;
-//            } else {
-//                reImgWidth = imgWidth;
-//                reImgHeight = imgHeight;
-//            }
-//        } else {
-//            if (imgWidth > conWidth) {
-//                reImgHeight = conHeight;
-//                reImgWidth = imgWidth * reImgHeight / imgHeight;
-//            } else {
-//                reImgWidth = imgWidth;
-//                reImgHeight = imgHeight;
-//            }
-//        }
-//        这个是强制缩放到与组件(Label)大小相同
+    private void setColorByValue() {
+        int colorG=(int)(255*(1-jbar1.getValue()/105.0));
+        if(!first&&jbar1.getValue()>80)
+            jbar1.setForeground(Color.RED);
+        else {
+            jbar1.setForeground(new Color(255, colorG,0));
+        }
+    }
 
+    private static ImageIcon getResizedImageIcon(ImageIcon icon, JLabel label) {
+//        这个是强制缩放到与组件(Label)大小相同
         if (label.getWidth() != 0 && label.getHeight() != 0)
             icon = new ImageIcon(icon.getImage()
                     .getScaledInstance(
                             label.getWidth(),
                             label.getHeight(),
                             Image.SCALE_DEFAULT));
-        //这个是按等比缩放
+//        这个是按等比缩放
 //        icon = new ImageIcon(icon.getImage().getScaledInstance(reImgWidth, reImgHeight, Image.SCALE_DEFAULT));
         return icon;
     }
@@ -272,12 +241,6 @@ public class InterFaceImp implements InterFace {
     // 设置棋盘和格子的框架样子，就是每个矩形的border
     public Border setBorder() {
         //这里可以设置棋盘的格子的border样式
-        //createEtchedBorder(BorderUIResource.EtchedBorderUIResource.RAISED);
-        //createLoweredSoftBevelBorder();
-//        BorderFactory.createEtchedBorder(BorderUIResource.EtchedBorderUIResource.LOWERED,
-//                new Color(Integer.parseInt("660000",16)),
-//                new Color(Integer.parseInt("cc0000",16)));
-//        return BorderFactory.createLineBorder(Color.RED, 1);
         return null;
     }
 
@@ -353,6 +316,7 @@ public class InterFaceImp implements InterFace {
         jl1 = new JLabel("one in pan1");
         jl1.setFont(new java.awt.Font("Dialog", Font.PLAIN,   15));
         jl1.setForeground(Color.WHITE);
+        jl1.setVerticalAlignment(SwingConstants.BOTTOM);
         UIManager.put("ProgressBar.selectionForeground",Color.WHITE);
         UIManager.put("ProgressBar.selectionBackground",Color.WHITE);
         jbar1=new JProgressBar(0);

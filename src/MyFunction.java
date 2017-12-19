@@ -6,7 +6,7 @@ import java.util.List;
 import static java.lang.Math.abs;
 
 /**
- * Created by 92377 on 2017/12/13.
+ * Created by MarsDingC on 2017/12/13.
  */
 public class MyFunction {
 

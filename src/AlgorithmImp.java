@@ -77,23 +77,23 @@ public class AlgorithmImp implements Algorithm {
     }
 
     /**
-     * 测试移动次数和等待次数
+     * 测试移动次数和等待次数，在逻辑结束时输出
      *
      * @param myInit
      */
     private void test(List<MyEnity> myInit) {
         time++;
-        boolean is = true;
+        boolean isOver = true;
         for (MyEnity aMyinit1 : myInit) {
             if (aMyinit1.getLength() != 0) {
-                is = false;
+                isOver = false;
                 break;
             }
             if (!aMyinit1.isMoved()) {
                 waitTime++;
             }
         }
-        if (is) {
+        if (isOver) {
             System.out.println("本次移动次数：" + time);
             System.out.println("本次等待次数：" + waitTime);
             allTime += time;
