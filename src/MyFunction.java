@@ -1,11 +1,7 @@
 import Bean.Enity;
-import sun.audio.AudioPlayer;
-import sun.audio.AudioStream;
+import Utile.Utile;
 
-import javax.sound.sampled.*;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.util.List;
 
 import static java.lang.Math.abs;
 
@@ -13,8 +9,6 @@ import static java.lang.Math.abs;
  * Created by 92377 on 2017/12/13.
  */
 public class MyFunction {
-
-
 
 
     /**
@@ -49,11 +43,18 @@ public class MyFunction {
         return abs(e1.getX() - e2.getX()) + abs(e1.getY() - e2.getY());
     }
 
-
-
-
-
-
+    static int countSuccess(List<Enity> now, List<Enity> aim) {
+        List<Enity> tempNow = Utile.copyList(now);
+        List<Enity> tempAim = Utile.copyList(aim);
+        int num = 0;
+        for (int i = 0; i < now.size(); ++i) {
+            for(int j=0;j<now.size();++j)
+            if (pong(tempNow.get(i), tempAim.get(j))) {
+                num++;
+            }
+        }
+        return num;
+    }
 
 
 }

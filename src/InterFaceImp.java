@@ -33,6 +33,7 @@ public class InterFaceImp implements InterFace {
     private static ImageIcon[] allin_image = new ImageIcon[960];
     private static ImageIcon stand;
     private JLabel jl1;
+    private JProgressBar jbar1;
     private static int count = 0;
     private static int step = 0;
     private static boolean first = true;
@@ -110,7 +111,19 @@ public class InterFaceImp implements InterFace {
 
         // 这里你们可以把人物以图标的形式展现出来，也可以改善下棋盘框框的样子
 
-        jl1.setText("当前用时："+Common.getUseTime()+"s       当前碰撞次数：0");
+        jl1.setText("当前用时："+Common.getUseTime()+"s       \n当前碰撞次数：0");
+        jbar1.setValue(MyFunction.countSuccess(now, aim));
+        jbar1.setString(MyFunction.countSuccess(now, aim)+"/105");
+
+        if(!first&&jbar1.getValue()>80)
+            jbar1.setForeground(Color.RED);
+        else if(jbar1.getValue()<20)
+            jbar1.setForeground(Color.YELLOW);
+        else if(jbar1.getValue()<40)
+            jbar1.setForeground(new Color(255,170,0));
+        else if(jbar1.getValue()<60)
+            jbar1.setForeground(new Color(255,85,0));
+
 
         // 以下是画画的流程
         // 1.棋盘清空
@@ -333,17 +346,33 @@ public class InterFaceImp implements InterFace {
         leftPanel.setPreferredSize(new Dimension(100, face.getHeight()));
         leftPanel.setBackground(Color.RED);
         face.getContentPane().add(leftPanel, "West");
-        JPanel bottomPanel = new JPanel();
 
+
+
+        JPanel bottomPanel = new JPanel(new BorderLayout());
         jl1 = new JLabel("one in pan1");
         jl1.setFont(new java.awt.Font("Dialog", Font.PLAIN,   15));
         jl1.setForeground(Color.WHITE);
-        bottomPanel.add(jl1);
+        UIManager.put("ProgressBar.selectionForeground",Color.WHITE);
+        UIManager.put("ProgressBar.selectionBackground",Color.WHITE);
+        jbar1=new JProgressBar(0);
+        jbar1.setMinimum(0);
+        jbar1.setMaximum(105);
+        jbar1.setValue(0);
+        jbar1.setBackground(Color.GRAY);
+        jbar1.setForeground(Color.RED);
+        jbar1.setString(String.valueOf(0));
+        jbar1.setStringPainted(true);
+
+        bottomPanel.add(jl1,BorderLayout.CENTER);
+        bottomPanel.add(jbar1,BorderLayout.SOUTH);
 
         bottomPanel.setPreferredSize(new Dimension(face.getWidth(), 150));
         bottomPanel.setBackground(Color.RED);
         face.getContentPane().add(bottomPanel, "South");
 
+
+        face.getContentPane().setBackground(Color.RED);
 
         face.setResizable(false);
         return face;
@@ -365,7 +394,7 @@ public class InterFaceImp implements InterFace {
         int useTime = Common.getUseTime();// 游戏已用时间
         bar.setBackground(Color.GRAY);
         bar.setForeground(Color.RED);
-        bar.setString(String.valueOf(allTime - count - useTime - 1));
+        bar.setString(String.valueOf(allTime - count - useTime - 1)+"/250");
         bar.setStringPainted(true);
         bar.setMinimumSize(new Dimension(500, 20));
         return bar;

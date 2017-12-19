@@ -4,16 +4,14 @@
  * @description:
  */
 
-import java.io.FileInputStream;
-import java.util.*;
-
 import Bean.Enity;
 import Transfer.Algorithm;
-import sun.audio.AudioPlayer;
-import sun.audio.AudioStream;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import static Utile.Utile.copyEnity;
-import static java.lang.Math.abs;
 
 public class AlgorithmImp implements Algorithm {
     //供你们参考的党徽里每个点具体的位置

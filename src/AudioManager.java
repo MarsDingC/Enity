@@ -45,7 +45,7 @@ public class AudioManager {
             }
             num++;
             clip.open(audioInputStream);
-            setValue(-10.0f);
+            setValue(-5.0f);
             clip.start();
             clip.loop(Clip.LOOP_CONTINUOUSLY);
         } catch (Exception e) {
@@ -69,7 +69,7 @@ public class AudioManager {
 
     static void restartBGM(){
         clip.stop();
-        clip.setFramePosition(160000);
+        clip.setFramePosition(180000);
         clip.start();
     }
 }
