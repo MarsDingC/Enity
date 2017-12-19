@@ -219,6 +219,8 @@ public class InterFaceImp implements InterFace {
         return jlabel;
     }
 
+
+    //实现进度条前景色动态变化
     private void setColorByValue() {
         int colorG = (int) (255 * (1 - jbar1.getValue() / 105.0));
         if (!first && jbar1.getValue() > 80)
@@ -228,6 +230,7 @@ public class InterFaceImp implements InterFace {
         }
     }
 
+    //实现图片素材拉伸
     private static ImageIcon getResizedImageIcon(ImageIcon icon, JLabel label) {
 //        这个是强制缩放到与组件(Label)大小相同
         if (label.getWidth() != 0 && label.getHeight() != 0)
@@ -254,14 +257,13 @@ public class InterFaceImp implements InterFace {
         JMenu helpMenu = new JMenu("帮助(H)");
         helpMenu.setMnemonic('H');
         JMenuItem aboutItem = new JMenuItem("关于");
-        aboutItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.CTRL_MASK));
+        aboutItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, InputEvent.CTRL_MASK));
         aboutItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 JOptionPane.showMessageDialog(null,
-                        "杨智添\n丁辰(923779127)\n赵勇\nGithub地址:/MarsDingC/Enity.git",
+                        "杨智添\n丁辰\n赵勇\nGithub地址:/MarsDingC/Enity.git",
                         "制作人员",
                         JOptionPane.INFORMATION_MESSAGE);
-
             }
         });
         JMenuBar bar = new JMenuBar();
